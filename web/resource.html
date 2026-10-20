@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ресурс — Бронь без конфликтов</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Бронь без конфликтов</h1>
+    <nav>
+      <a href="/index.html">Каталог</a>
+      <a href="/my.html">Мои брони</a>
+      <a href="/admin.html" id="admin-link" hidden>Админка</a>
+      <span class="hint" id="who"></span>
+      <a href="#" id="logout">Выйти</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="state" class="state">Загрузка…</div>
+
+    <div id="content" hidden>
+      <div class="card">
+        <h2 id="res-name"></h2>
+        <div class="meta" id="res-location"></div>
+        <p id="res-description"></p>
+      </div>
+
+      <div class="card">
+        <h3>Занятые интервалы</h3>
+        <p class="hint">Время указано по Москве (МСК).</p>
+        <label for="date">Дата</label>
+        <input id="date" type="date">
+        <div id="busy" class="list" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="card">
+        <h3>Забронировать</h3>
+        <p class="hint">Доступно ежедневно с 08:00 до 22:00 МСК, шаг 30 минут, от 30 минут до 4 часов.</p>
+
+        <form id="book-form" novalidate>
+          <label for="start">Начало (МСК)</label>
+          <input id="start" type="time" step="1800" required>
+          <div class="error" data-for="start"></div>
+
+          <label for="end">Окончание (МСК)</label>
+          <input id="end" type="time" step="1800" required>
+          <div class="error" data-for="end"></div>
+
+          <label for="purpose">Цель (5–300 символов)</label>
+          <textarea id="purpose" rows="3" maxlength="300" required></textarea>
+          <div class="error" data-for="purpose"></div>
+
+          <div class="error" id="form-error" role="alert"></div>
+
+          <div style="margin-top:12px;">
+            <button type="submit" id="submit">Забронировать</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="success" class="card ok" hidden>
+        <h3>Бронь создана</h3>
+        <div id="success-body"></div>
+        <p><a href="/my.html">Перейти к моим бронированиям</a></p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/pages/resource.js"></script>
+</body>
+</html>

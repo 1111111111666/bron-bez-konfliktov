@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Вход — Бронь без конфликтов</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Бронь без конфликтов</h1>
+  </header>
+
+  <main>
+    <div class="card" style="max-width: 420px; margin: 0 auto;">
+      <h2>Вход</h2>
+      <form id="login-form" novalidate>
+        <label for="login">Логин</label>
+        <input id="login" name="login" autocomplete="username" required>
+
+        <label for="password">Пароль</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+        <div class="error" id="error" role="alert"></div>
+
+        <div style="margin-top: 16px; display: flex; gap: 8px; align-items: center;">
+          <button type="submit" id="submit">Войти</button>
+          <span class="hint">Демо: user1 / Passw0rd!</span>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="/js/pages/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    container_name: bron_db
+    environment:
+      POSTGRES_DB: bron
+      POSTGRES_USER: bron
+      POSTGRES_PASSWORD: bron_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: bron_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

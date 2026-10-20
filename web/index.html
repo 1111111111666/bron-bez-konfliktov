@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Каталог — Бронь без конфликтов</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Бронь без конфликтов</h1>
+    <nav>
+      <a href="/index.html">Каталог</a>
+      <a href="/my.html">Мои брони</a>
+      <a href="/admin.html" id="admin-link" hidden>Админка</a>
+      <span class="hint" id="who"></span>
+      <a href="#" id="logout">Выйти</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:2; min-width:200px;">
+          <label for="search">Поиск по названию</label>
+          <input id="search" type="search" placeholder="Например, Переговорная 1">
+        </div>
+        <div style="flex:1; min-width:160px;">
+          <label for="location">Локация</label>
+          <select id="location">
+            <option value="">Все локации</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="state" class="state">Загрузка…</div>
+    <div id="list" class="list" hidden></div>
+  </main>
+
+  <script type="module" src="/js/pages/catalog.js"></script>
+</body>
+</html>
