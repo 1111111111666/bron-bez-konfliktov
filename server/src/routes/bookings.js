@@ -23,16 +23,24 @@ bookingsRouter.post('/', async (req, res, next) => {
     const endDate = new Date(end);
     validateBookingTime(startDate, endDate);
 
-    const booking = await createBooking({
-      ownerId: req.user.sub,          // владелец — из JWT, не из тела!
+    // ВОТ ЭТА СТРОКА ПОТЕРЯЛАСЬ:
+    const idempotencyKey = req.headers['idempotency-key'];
+    if (idempotencyKey && (typeof idempotencyKey !== 'string' || idempotencyKey.length > 100)) {
+      return res.status(400).json({ code: 'VALIDATION', message: 'Idempotency-Key до 100 символов' });
+    }
+
+    const { booking, replayed } = await createBooking({
+      ownerId: req.user.sub,
       resourceId: resource_id,
       start: startDate,
       end: endDate,
       purpose,
+      idempotencyKey,
       traceId: req.traceId,
     });
 
-    res.status(201).json(booking);
+    if (replayed) res.setHeader('X-Idempotent-Replay', 'true');
+    res.status(replayed ? 200 : 201).json(booking);
   } catch (err) {
     next(err);
   }

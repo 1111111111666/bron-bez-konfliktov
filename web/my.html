@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мои брони — Бронь без конфликтов</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Бронь без конфликтов</h1>
+    <nav>
+      <a href="/index.html">Каталог</a>
+      <a href="/my.html">Мои брони</a>
+      <a href="/admin.html" id="admin-link" hidden>Админка</a>
+      <span class="hint" id="who"></span>
+      <a href="#" id="logout">Выйти</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:1; min-width:200px;">
+          <label for="status">Статус</label>
+          <select id="status">
+            <option value="">Все</option>
+            <option value="active">Активные</option>
+            <option value="cancelled">Отменённые</option>
+            <option value="finished">Завершённые</option>
+          </select>
+        </div>
+        <div>
+          <button type="button" id="refresh" class="secondary">Обновить</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="state" class="state">Загрузка…</div>
+    <div id="list" class="list" hidden></div>
+  </main>
+
+  <script type="module" src="/js/pages/my.js"></script>
+</body>
+</html>

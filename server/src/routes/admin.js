@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { query } from '../db.js';
+import { query, withTransaction } from '../db.js';
 import { authRequired, adminRequired } from '../auth.js';
 
 export const adminRouter = Router();
@@ -7,27 +7,41 @@ export const adminRouter = Router();
 // Все маршруты ниже — только admin
 adminRouter.use(authRequired, adminRequired);
 
+// ============ РЕСУРСЫ ============
+
+// GET /api/admin/resources — все, включая отключённые
+adminRouter.get('/resources', async (req, res, next) => {
+  try {
+    const result = await query(
+      'SELECT id, name, description, location, is_active FROM resources ORDER BY id'
+    );
+    res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
 // POST /api/admin/resources
-adminRouter.post('/resources', async (req, res) => {
-  const { name, description, location } = req.body || {};
+adminRouter.post('/resources', async (req, res, next) => {
+  try {
+    const { name, description, location } = req.body || {};
 
-  if (!name || typeof name !== 'string' || name.length > 100) {
-    return res.status(400).json({ code: 'VALIDATION', message: 'name обязателен, до 100 символов' });
-  }
-  if (!location || typeof location !== 'string' || location.length > 100) {
-    return res.status(400).json({ code: 'VALIDATION', message: 'location обязателен, до 100 символов' });
-  }
-  if (description != null && (typeof description !== 'string' || description.length > 500)) {
-    return res.status(400).json({ code: 'VALIDATION', message: 'description до 500 символов' });
-  }
+    if (!name || typeof name !== 'string' || name.length > 100) {
+      return res.status(400).json({ code: 'VALIDATION', message: 'name обязателен, до 100 символов' });
+    }
+    if (!location || typeof location !== 'string' || location.length > 100) {
+      return res.status(400).json({ code: 'VALIDATION', message: 'location обязателен, до 100 символов' });
+    }
+    if (description != null && (typeof description !== 'string' || description.length > 500)) {
+      return res.status(400).json({ code: 'VALIDATION', message: 'description до 500 символов' });
+    }
 
-  const result = await query(
-    `INSERT INTO resources (name, description, location, is_active)
-     VALUES ($1, $2, $3, true)
-     RETURNING id, name, description, location, is_active`,
-    [name, description ?? null, location]
-  );
-  res.status(201).json(result.rows[0]);
+    const result = await query(
+      `INSERT INTO resources (name, description, location, is_active)
+       VALUES ($1, $2, $3, true)
+       RETURNING id, name, description, location, is_active`,
+      [name, description ?? null, location]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { next(err); }
 });
 
 // PATCH /api/admin/resources/:id
@@ -90,5 +104,76 @@ adminRouter.patch('/resources/:id', async (req, res, next) => {
     });
 
     res.json(updated);
+  } catch (err) { next(err); }
+});
+
+// ============ ВСЕ БРОНИ ============
+
+// GET /api/admin/bookings?date=&resource_id=&status=
+adminRouter.get('/bookings', async (req, res, next) => {
+  try {
+    const { date, resource_id, status } = req.query;
+
+    const conditions = [];
+    const params = [];
+
+    if (date) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return res.status(400).json({ code: 'VALIDATION', message: 'date в формате YYYY-MM-DD' });
+      }
+      params.push(date);
+      conditions.push(`b.start_time < ($${params.length}::date + interval '1 day') AT TIME ZONE 'Europe/Moscow'`);
+      conditions.push(`b.end_time   >  $${params.length}::date AT TIME ZONE 'Europe/Moscow'`);
+    }
+    if (resource_id) {
+      const rid = Number(resource_id);
+      if (!Number.isInteger(rid)) {
+        return res.status(400).json({ code: 'VALIDATION', message: 'resource_id должен быть числом' });
+      }
+      params.push(rid);
+      conditions.push(`b.resource_id = $${params.length}`);
+    }
+    if (status) {
+      if (!['Active', 'Cancelled'].includes(status)) {
+        return res.status(400).json({ code: 'VALIDATION', message: 'status: Active или Cancelled' });
+      }
+      params.push(status);
+      conditions.push(`b.status = $${params.length}`);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const result = await query(
+      `SELECT b.id, b.resource_id, r.name AS resource_name,
+              b.owner_id, u.login AS owner_login, u.name AS owner_name,
+              b.start_time, b.end_time, b.purpose, b.status,
+              b.created_at, b.cancelled_by, b.cancelled_at, b.cancel_reason
+       FROM bookings b
+       JOIN resources r ON r.id = b.resource_id
+       JOIN users u ON u.id = b.owner_id
+       ${where}
+       ORDER BY b.start_time DESC
+       LIMIT 500`,
+      params
+    );
+    res.json(result.rows);
+  } catch (err) { next(err); }
+});
+
+// ============ АУДИТ ============
+
+// GET /api/admin/audit?limit=
+adminRouter.get('/audit', async (req, res, next) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 100, 500);
+    const result = await query(
+      `SELECT a.id, a.occurred_at, a.actor_id, u.login AS actor_login,
+              a.action, a.object_type, a.object_id, a.result, a.trace_id
+       FROM audit_events a
+       LEFT JOIN users u ON u.id = a.actor_id
+       ORDER BY a.id DESC
+       LIMIT $1`,
+      [limit]
+    );
+    res.json(result.rows);
   } catch (err) { next(err); }
 });

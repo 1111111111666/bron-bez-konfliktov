@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Админка — Бронь без конфликтов</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Бронь без конфликтов</h1>
+    <nav>
+      <a href="/index.html">Каталог</a>
+      <a href="/my.html">Мои брони</a>
+      <a href="/admin.html">Админка</a>
+      <span class="hint" id="who"></span>
+      <a href="#" id="logout">Выйти</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- РЕСУРСЫ -->
+    <section class="card">
+      <h2>Ресурсы</h2>
+
+      <form id="create-resource" style="display:flex; gap:8px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:2; min-width:180px;">
+          <label for="r-name">Название</label>
+          <input id="r-name" required maxlength="100">
+        </div>
+        <div style="flex:2; min-width:180px;">
+          <label for="r-location">Локация</label>
+          <input id="r-location" required maxlength="100">
+        </div>
+        <div style="flex:3; min-width:200px;">
+          <label for="r-description">Описание (необязательно)</label>
+          <input id="r-description" maxlength="500">
+        </div>
+        <div>
+          <button type="submit" id="r-create-btn">Создать</button>
+        </div>
+      </form>
+      <div class="error" id="r-error" role="alert"></div>
+
+      <div id="resources-state" class="state">Загрузка…</div>
+      <div id="resources-list" class="list" hidden></div>
+    </section>
+
+    <!-- ВСЕ БРОНИ -->
+    <section class="card">
+      <h2>Все брони</h2>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:end;">
+        <div style="flex:1; min-width:150px;">
+          <label for="f-date">Дата</label>
+          <input id="f-date" type="date">
+        </div>
+        <div style="flex:1; min-width:150px;">
+          <label for="f-resource">Ресурс</label>
+          <select id="f-resource"><option value="">Все</option></select>
+        </div>
+        <div style="flex:1; min-width:150px;">
+          <label for="f-status">Статус</label>
+          <select id="f-status">
+            <option value="">Все</option>
+            <option value="Active">Активные</option>
+            <option value="Cancelled">Отменённые</option>
+          </select>
+        </div>
+        <div>
+          <button type="button" id="f-apply" class="secondary">Применить</button>
+        </div>
+      </div>
+
+      <div id="bookings-state" class="state">Загрузка…</div>
+      <div id="bookings-list" class="list" hidden></div>
+    </section>
+
+    <!-- АУДИТ -->
+    <section class="card">
+      <h2>Аудит</h2>
+      <div>
+        <button type="button" id="audit-refresh" class="secondary">Обновить</button>
+      </div>
+      <div id="audit-state" class="state">Загрузка…</div>
+      <div id="audit-list" class="list" hidden></div>
+    </section>
+  </main>
+
+  <script type="module" src="/js/pages/admin.js"></script>
+</body>
+</html>

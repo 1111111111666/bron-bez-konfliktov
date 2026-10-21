@@ -1,4 +1,4 @@
-import { withTransaction } from '../db.js';
+import { query, withTransaction } from '../db.js';
 import crypto from 'node:crypto';
 
 // Границы окна бронирования по МСК
