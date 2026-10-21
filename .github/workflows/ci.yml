@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Syntax check (node --check)
+        run: |
+          for f in $(find src -name "*.js"); do
+            node --check "$f" || exit 1
+          done
+
+      - name: Build artifact (pack)
+        run: npm pack --dry-run
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-src
+          path: server/
+          retention-days: 7

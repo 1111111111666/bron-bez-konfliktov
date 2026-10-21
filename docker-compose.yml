@@ -22,5 +22,19 @@ services:
     depends_on:
       - db
 
+  app:
+    build: ./server
+    container_name: bron_app
+    environment:
+      DATABASE_URL: postgres://bron:bron_pass@db:5432/bron
+      JWT_SECRET: dev-secret-change-me
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    profiles: ["full"]   # запускается только с `--profile full`
+
 volumes:
   pgdata:
