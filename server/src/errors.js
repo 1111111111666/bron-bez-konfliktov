@@ -17,7 +17,7 @@ export function traceIdMiddleware(req, res, next) {
 }
 
 /** Финальный error-handler. Ставится ПОСЛЕДНИМ через app.use */
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res) {
   // Приводим к единому виду
   const status = err.status || 500;
   const code = err.code || 'INTERNAL';
